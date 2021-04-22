@@ -6,3 +6,9 @@
 ## Usage
 
 All code and tests are run under [Deno](https://deno.land/), you can see `.vscode/settings.json` for more details about Deno config.
+
+## Scripts
+
+This Project use [velociraptor](https://github.com/jurassiscripts/velociraptor) to manage scripts for Deno.
+
+You can run `vr test` or `vr lint` to use these scripts.

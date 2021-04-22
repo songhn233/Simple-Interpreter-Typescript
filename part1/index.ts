@@ -1,4 +1,4 @@
-enum Type {
+export enum Type {
   INTEGER,
   PLUS,
   EOF,
@@ -19,9 +19,9 @@ interface EOF {
   value?: undefined
 }
 
-type TokenProps = Integer | Plus | EOF
+export type TokenProps = Integer | Plus | EOF
 
-class Token {
+export class Token {
   constructor(readonly tokenProps: TokenProps) {}
 
   [Symbol.toPrimitive]() {
@@ -34,7 +34,7 @@ export class Interpreter {
   private current_token = new Token({ type: Type.EOF })
   constructor(private text: string) {}
   error() {
-    throw new Error('Error parsing input')
+    throw new Error('Error Parsing Input')
   }
   get_next_token() {
     if (this.pos >= this.text.length) {

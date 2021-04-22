@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "lint": "deno lint --unstable",
+    "test": "deno test --coverage --unstable"
+  }
+}
