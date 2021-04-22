@@ -31,12 +31,12 @@ export class Token {
 
 export class Interpreter {
   private pos = 0
-  private current_token = new Token({ type: Type.EOF })
+  private currentToken = new Token({ type: Type.EOF })
   constructor(private text: string) {}
   error() {
     throw new Error('Error Parsing Input')
   }
-  get_next_token() {
+  getNextToken() {
     if (this.pos >= this.text.length) {
       return new Token({ type: Type.EOF })
     }
@@ -55,22 +55,22 @@ export class Interpreter {
     return new Token({ type: Type.EOF })
   }
   eat(type: Type) {
-    if (this.current_token.tokenProps.type === type) {
-      this.current_token = this.get_next_token()
+    if (this.currentToken.tokenProps.type === type) {
+      this.currentToken = this.getNextToken()
     } else {
       this.error()
     }
   }
   exper() {
-    this.current_token = this.get_next_token()
+    this.currentToken = this.getNextToken()
 
-    const left = this.current_token
+    const left = this.currentToken
     this.eat(Type.INTEGER)
 
-    const _ = this.current_token
+    const _ = this.currentToken
     this.eat(Type.PLUS)
 
-    const right = this.current_token
+    const right = this.currentToken
     this.eat(Type.INTEGER)
 
     return String(

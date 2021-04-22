@@ -9,6 +9,6 @@ All code and tests are run under [Deno](https://deno.land/), you can see `.vscod
 
 ## Scripts
 
-This Project use [velociraptor](https://github.com/jurassiscripts/velociraptor) to manage scripts for Deno.
+This project uses [velociraptor](https://github.com/jurassiscripts/velociraptor) to manage scripts for Deno.
 
 You can run `vr test` or `vr lint` to use these scripts.

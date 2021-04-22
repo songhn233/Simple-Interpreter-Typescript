@@ -97,6 +97,8 @@ export class Interpreter {
   eat(type: Type) {
     if (this.currentToken.tokenProps.type === type) {
       this.currentToken = this.get_next_token()
+    } else {
+      this.error()
     }
   }
   exper() {

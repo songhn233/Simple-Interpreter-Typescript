@@ -24,6 +24,11 @@ Deno.test('Parse Error(3 * 4)', () => {
   assertThrows(() => interpreter.exper(), Error, 'Error Parsing Input')
 })
 
+Deno.test('Parse Error(3 -- 4)', () => {
+  const interpreter = new Interpreter('3 -- 4')
+  assertThrows(() => interpreter.exper(), Error, 'Error Parsing Input')
+})
+
 Deno.test('Token Print', () => {
   const token = new Token({ type: Type.PLUS, value: '+' })
   assertEquals(String(token), 'Token(1, +)')
