@@ -1,7 +1,7 @@
 /*
 exper: term ((PLUS|MINUS) term)*
 term: factor ((MUL|DIV) factor)*
-factor: INTEGER
+factor: INTEGER | LPARTEN exper RPARTEN
 */
 export enum Type {
   INTEGER,
@@ -64,6 +64,7 @@ export type TokenProps =
   | RPARTEN
   | EOF
 
+/* Lexer */
 export class Token {
   constructor(readonly tokenProps: TokenProps) {}
 
@@ -159,8 +160,26 @@ export class Lexer {
     return new Token({ type: Type.EOF })
   }
 }
+/* Parse */
+class AST {
+  constructor() {}
+}
 
-export class Interpreter {
+class BinOp extends AST {
+  constructor(readonly left: AST, readonly right: AST, readonly op: Token) {
+    super()
+  }
+}
+
+class Num extends AST {
+  readonly value: number
+  constructor(token: Token) {
+    super()
+    this.value = token.tokenProps.value as number
+  }
+}
+
+export class Parser {
   private currentToken = new Token({ type: Type.EOF })
   constructor(private lexer: Lexer) {
     this.currentToken = this.lexer.getNextToken()
@@ -176,50 +195,104 @@ export class Interpreter {
     }
   }
   factor() {
-    let ans = 0
     if (this.currentToken.tokenProps.type === Type.INTEGER) {
-      ans = this.currentToken.tokenProps.value as number
+      const node = new Num(this.currentToken)
       this.eat(Type.INTEGER)
+      return node
     } else if (this.currentToken.tokenProps.type === Type.LPARTEN) {
       this.eat(Type.LPARTEN)
-      ans = +this.exper()
+      const node = this.parse()
       this.eat(Type.RPARTEN)
+      return node
     } else {
       this.error()
     }
-    return ans
+    return new AST()
   }
-  term(): string {
+  term() {
     let result = this.factor()
-
     while (
       [Type.MUL, Type.DIV].some((v) => v === this.currentToken.tokenProps.type)
     ) {
-      if (this.currentToken.tokenProps.type === Type.MUL) {
-        this.eat(Type.MUL)
-        result *= this.factor()
-      } else {
-        this.eat(Type.DIV)
-        result = Math.floor(result / this.factor())
-      }
+      const op = this.currentToken
+      this.currentToken.tokenProps.type === Type.MUL
+        ? this.eat(Type.MUL)
+        : this.eat(Type.DIV)
+      result = new BinOp(result, this.factor(), op)
     }
-    return String(result)
+    return result
   }
-  exper() {
-    let result = +this.term()
+  parse(): AST {
+    let result = this.term()
     while (
       [Type.PLUS, Type.MINUS].some(
         (v) => v === this.currentToken.tokenProps.type
       )
     ) {
-      if (this.currentToken.tokenProps.type === Type.PLUS) {
-        this.eat(Type.PLUS)
-        result += +this.term()
-      } else {
-        this.eat(Type.MINUS)
-        result -= +this.term()
-      }
+      const op = this.currentToken
+      this.currentToken.tokenProps.type === Type.PLUS
+        ? this.eat(Type.PLUS)
+        : this.eat(Type.MINUS)
+      const right = this.term()
+      result = new BinOp(result, right, op)
     }
-    return String(result)
+    return result
+  }
+}
+/* Interpreter */
+export class NodeVisitor {
+  error() {
+    throw new Error('NodeVisitor: Error Parsing Input')
+  }
+  visit(node: AST) {
+    if (node instanceof BinOp) {
+      return new BinOpVisitor().visitBinOp(node)
+    }
+    if (node instanceof Num) {
+      return new NumVisitor().visitNum(node)
+    }
+    this.error()
+  }
+}
+
+export class BinOpVisitor extends NodeVisitor {
+  visitBinOp(node: BinOp): number {
+    switch (node.op.tokenProps.type) {
+      case Type.PLUS:
+        return (
+          (this.visit(node.left) as number) + (this.visit(node.right) as number)
+        )
+      case Type.MINUS:
+        return (
+          (this.visit(node.left) as number) - (this.visit(node.right) as number)
+        )
+      case Type.MUL:
+        return (
+          (this.visit(node.left) as number) * (this.visit(node.right) as number)
+        )
+      case Type.DIV:
+        return Math.floor(
+          (this.visit(node.left) as number) / (this.visit(node.right) as number)
+        )
+      default:
+        return 0
+    }
+  }
+}
+
+export class NumVisitor extends NodeVisitor {
+  visitNum(node: Num) {
+    return node.value
+  }
+}
+
+export class Interpreter {
+  constructor(private parser: Parser) {}
+  error() {
+    throw new Error('Interpreter: Error Parsing Input')
+  }
+  interpret() {
+    const tree = this.parser.parse()
+    return String(new NodeVisitor().visit(tree))
   }
 }
