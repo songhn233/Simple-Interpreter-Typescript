@@ -1,6 +1,6 @@
 {
   "scripts": {
     "lint": "deno lint --unstable",
-    "test": "deno test --coverage --unstable"
+    "test": "deno test --coverage=coverage --unstable && deno --unstable coverage ./coverage --lcov > coverage.lcov && genhtml -o coverage/html coverage.lcov"
   }
 }

@@ -48,6 +48,15 @@ Deno.test('Parse Error(3 & 4)', () => {
   assertThrows(() => interpreter.exper(), Error, 'Lexer: Error Parsing Input')
 })
 
+Deno.test('Parse Error((3*4()', () => {
+  const interpreter = new Interpreter(new Lexer('(3*4('))
+  assertThrows(
+    () => interpreter.exper(),
+    Error,
+    'Interpreter: Error Parsing Input'
+  )
+})
+
 Deno.test('Parse Error(3 // 4)', () => {
   const interpreter = new Interpreter(new Lexer('3 // 4'))
   assertThrows(
