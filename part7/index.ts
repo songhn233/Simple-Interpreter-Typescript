@@ -79,9 +79,6 @@ export class Lexer {
   constructor(private text: string) {
     this.currentChar = text[0]
   }
-  error() {
-    throw new Error('Lexer: Error Parsing Input')
-  }
   advance() {
     if (this.pos >= this.text.length - 1) {
       this.currentChar = ''
@@ -155,7 +152,7 @@ export class Lexer {
           value: ')',
         })
       }
-      this.error()
+      throw new Error('Lexer: Error Parsing Input')
     }
     return new Token({ type: Type.EOF })
   }
@@ -184,14 +181,11 @@ export class Parser {
   constructor(private lexer: Lexer) {
     this.currentToken = this.lexer.getNextToken()
   }
-  error() {
-    throw new Error('Interpreter: Error Parsing Input')
-  }
   eat(type: Type) {
     if (this.currentToken.tokenProps.type === type) {
       this.currentToken = this.lexer.getNextToken()
     } else {
-      this.error()
+      throw new Error('Parser: Error Parsing Input')
     }
   }
   factor() {
@@ -204,10 +198,8 @@ export class Parser {
       const node = this.parse()
       this.eat(Type.RPARTEN)
       return node
-    } else {
-      this.error()
     }
-    return new AST()
+    throw new Error('Parser: Error Parsing Input')
   }
   term() {
     let result = this.factor()
@@ -241,41 +233,30 @@ export class Parser {
 }
 /* Interpreter */
 export class NodeVisitor {
-  error() {
-    throw new Error('NodeVisitor: Error Parsing Input')
-  }
-  visit(node: AST) {
+  visit(node: AST): number {
     if (node instanceof BinOp) {
       return new BinOpVisitor().visitBinOp(node)
     }
     if (node instanceof Num) {
       return new NumVisitor().visitNum(node)
     }
-    this.error()
+    throw new Error('Interpreter: Error Parsing Input')
   }
 }
 
 export class BinOpVisitor extends NodeVisitor {
-  visitBinOp(node: BinOp): number {
-    switch (node.op.tokenProps.type) {
+  visitBinOp(node: BinOp) {
+    switch (
+      node.op.tokenProps.type as Type.PLUS | Type.MINUS | Type.MUL | Type.DIV
+    ) {
       case Type.PLUS:
-        return (
-          (this.visit(node.left) as number) + (this.visit(node.right) as number)
-        )
+        return this.visit(node.left) + this.visit(node.right)
       case Type.MINUS:
-        return (
-          (this.visit(node.left) as number) - (this.visit(node.right) as number)
-        )
+        return this.visit(node.left) - this.visit(node.right)
       case Type.MUL:
-        return (
-          (this.visit(node.left) as number) * (this.visit(node.right) as number)
-        )
+        return this.visit(node.left) * this.visit(node.right)
       case Type.DIV:
-        return Math.floor(
-          (this.visit(node.left) as number) / (this.visit(node.right) as number)
-        )
-      default:
-        return 0
+        return Math.floor(this.visit(node.left) / this.visit(node.right))
     }
   }
 }
@@ -288,9 +269,6 @@ export class NumVisitor extends NodeVisitor {
 
 export class Interpreter {
   constructor(private parser: Parser) {}
-  error() {
-    throw new Error('Interpreter: Error Parsing Input')
-  }
   interpret() {
     const tree = this.parser.parse()
     return String(new NodeVisitor().visit(tree))

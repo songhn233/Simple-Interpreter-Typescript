@@ -43,7 +43,7 @@ Deno.test('Parse Error())', () => {
   assertThrows(
     () => interpreter.interpret(),
     Error,
-    'Interpreter: Error Parsing Input'
+    'Parser: Error Parsing Input'
   )
 })
 
@@ -61,7 +61,7 @@ Deno.test('Parse Error((3*4()', () => {
   assertThrows(
     () => interpreter.interpret(),
     Error,
-    'Interpreter: Error Parsing Input'
+    'Parser: Error Parsing Input'
   )
 })
 
@@ -70,7 +70,7 @@ Deno.test('Parse Error(3 // 4)', () => {
   assertThrows(
     () => interpreter.interpret(),
     Error,
-    'Interpreter: Error Parsing Input'
+    'Parser: Error Parsing Input'
   )
 })
 
