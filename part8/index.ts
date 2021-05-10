@@ -283,7 +283,6 @@ export class BinOpVisitor extends NodeVisitor {
 
 export class UnaryOpVisitor extends NodeVisitor {
   visitUnaryOp(node: UnaryOp) {
-    console.log(node.exper)
     if (node.op.tokenProps.type === Type.PLUS) {
       return +this.visit(node.exper)
     } else {
