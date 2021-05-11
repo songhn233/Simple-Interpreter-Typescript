@@ -1,7 +1,9 @@
 import { assertEquals } from 'https://deno.land/std@0.94.0/testing/asserts.ts'
-import { Parser, Lexer, Interpreter, NodeVisitor } from './index.ts'
+import { Lexer } from './lexer.ts'
+import { Parser } from './parse.ts'
+import { Interpreter, NodeVisitor } from './interpreter.ts'
 
-Deno.test('Expression(7*8)', () => {
+Deno.test('Expression', () => {
   const interpreter = new Interpreter(
     new Parser(
       new Lexer(`
