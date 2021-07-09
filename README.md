@@ -1,4 +1,5 @@
 # Simple-Interpreter-Typesript
+## 🚧 WIP: Current Progress: 9 / 19
 ## Description
 
 [Let's Build A Simple Interpreter](https://github.com/rspivak/lsbasi) (Typescript Implement)
